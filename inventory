@@ -1,0 +1,2 @@
+[http_hosts]
+http-host.example.com ansible_host=10.1.2.3 ansible_user=root

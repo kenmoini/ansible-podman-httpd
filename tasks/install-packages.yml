@@ -1,0 +1,18 @@
+---
+- name: Install base packages
+  ansible.builtin.package:
+    name: "{{ pkg_item }}"
+    state: present
+  loop: "{{ base_packages }}"
+  loop_control:
+    loop_var: pkg_item
+  tags:
+    - install_base_packages
+
+- name: Install cockpit-podman if this is not a RHEL 7 system
+  when: ansible_distribution_major_version > "7"
+  ansible.builtin.package:
+    name: cockpit-podman
+    state: present
+  tags:
+    - install_cockpit_podman

@@ -1,0 +1,44 @@
+---
+- name: Template the Httpd Podman service
+  ansible.builtin.template:
+    src: httpd-podman.service.j2
+    dest: /etc/systemd/system/httpd-podman.service
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - template_httpd_podman_service
+
+- name: Template the service script
+  ansible.builtin.template:
+    src: httpdctl.sh.j2
+    dest: /opt/httpdctl.sh
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - template_service_script
+
+- name: Create the www root directory
+  ansible.builtin.file:
+    path: "{{ container_www_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - create_www_root_dir
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  tags:
+    - reload_systemd
+
+- name: Start the Httpd Podman service
+  ansible.builtin.service:
+    name: httpd-podman
+    state: started
+    enabled: true
+  tags:
+    - start_httpd_podman_service

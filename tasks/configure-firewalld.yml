@@ -1,0 +1,27 @@
+---
+- name: Enable Firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: true
+  tags:
+    - enable_firewalld
+
+- name: Open the port for Cockpit
+  when: setup_cockpit
+  ansible.posix.firewalld:
+    port: 9090/tcp
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - open_cockpit_port
+
+- name: Open the HTTP port
+  ansible.posix.firewalld:
+    port: "{{ container_http_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - open_http_port

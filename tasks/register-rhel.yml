@@ -1,0 +1,7 @@
+---
+- name: Register the RHEL system with RHSM
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ rhsm_username }}"
+    password: "{{ rhsm_password }}"
+    auto_attach: true

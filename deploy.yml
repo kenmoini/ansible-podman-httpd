@@ -1,0 +1,57 @@
+---
+- name: Setup a RHEL host to run an Apache web server via Podman
+  hosts: http_hosts
+  gather_facts: true
+  become: true
+
+  tasks:
+
+    - name: Register the RHEL system
+      ansible.builtin.include_tasks:
+        file: tasks/register-rhel.yml
+        apply:
+          tags:
+          - register_rhsm
+
+    - name: Enable the needed repos
+      ansible.builtin.include_tasks:
+        file: tasks/enable-repos.yml
+        apply:
+          tags:
+          - enable_repos
+
+    - name: Install the base packages
+      ansible.builtin.include_tasks:
+        file: tasks/install-packages.yml
+        apply:
+          tags:
+          - install_base
+
+    - name: Setup Cockpit
+      when: setup_cockpit
+      ansible.builtin.include_tasks:
+        file: tasks/setup-cockpit.yml
+        apply:
+          tags:
+          - setup_cockpit
+
+    - name: Configure Firewalld
+      ansible.builtin.include_tasks:
+        file: tasks/configure-firewalld.yml
+        apply:
+          tags:
+          - configure_firewalld
+
+    - name: Setup Podman
+      ansible.builtin.include_tasks:
+        file: tasks/setup-podman.yml
+        apply:
+          tags:
+          - setup_podman
+
+    - name: Setup the HTTPD container
+      ansible.builtin.include_tasks:
+        file: tasks/setup-httpd-container.yml
+        apply:
+          tags:
+          - setup_httpd_container

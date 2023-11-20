@@ -1,0 +1,57 @@
+#!/bin/bash
+
+CONTAINER_NAME="{{ container_name }}"
+
+###################################################################################
+# EXECUTION PREFLIGHT
+###################################################################################
+
+## Ensure there is an action arguement
+if [ -z "$1" ]; then
+  echo "Need action arguement of 'start', 'restart', or 'stop'!"
+  echo "${0} start|stop|restart"
+  exit 1
+fi
+
+
+################################################################################### SERVICE ACTION SWITCH
+case $1 in
+
+  ################################################################################# RESTART/STOP SERVICE
+  "stop" )
+    echo "Stopping container services if running..."
+
+    echo "Killing ${CONTAINER_NAME} container..."
+    /usr/bin/podman kill ${CONTAINER_NAME} || true
+
+    echo "Removing ${CONTAINER_NAME} container..."
+    /usr/bin/podman rm ${CONTAINER_NAME} || true
+    ;;
+
+esac
+
+case $1 in
+
+  ################################################################################# RESTART/START SERVICE
+  "restart" | "start")
+    echo "Stopping container services if running..."
+
+    echo "Killing ${CONTAINER_NAME} container..."
+    /usr/bin/podman kill ${CONTAINER_NAME} || true
+
+    echo "Removing ${CONTAINER_NAME} container..."
+    /usr/bin/podman rm ${CONTAINER_NAME} || true
+
+    sleep 3
+
+    echo "Starting container services..."
+
+    # Deploy ${CONTAINER_NAME} container
+    echo -e "Deploying ${CONTAINER_NAME}...\n"
+
+    /usr/bin/podman create --name {{ container_name }} -p {{ container_http_port }}:8080 -v {{ container_www_root }}:/var/www/html {{ container_image }}
+    /usr/bin/podman start {{ container_name }}
+
+    ;;
+
+esac
